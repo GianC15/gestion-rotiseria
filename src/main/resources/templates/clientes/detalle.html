@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${cliente.nombre} + ' — Lo De Monica'"></title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1 th:text="${cliente.nombre}"></h1>
+        <p>Detalle del cliente</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Información</div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div>
+                <div style="font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Teléfono</div>
+                <div style="margin-top: 4px;" th:text="${cliente.telefono ?: 'No registrado'}"></div>
+            </div>
+            <div>
+                <div style="font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Estado</div>
+                <div style="margin-top: 4px;">
+                    <span th:text="${cliente.activo ? 'Activo' : 'Inactivo'}"
+                          th:classappend="${cliente.activo} ? 'badge-activa' : 'badge-fiado'"
+                          class="badge"></span>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 20px;">
+            <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}" class="btn btn-primary">Editar</a>
+            <a href="/clientes" class="btn btn-secondary" style="margin-left: 8px;">Volver</a>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

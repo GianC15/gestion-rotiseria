@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="navbar" class="navbar">
+    <a href="/" class="navbar-brand">
+        <img th:src="@{/images/logo.png}" alt="Lo De Monica" style="height: 36px; width: auto;"/>
+    </a>
+    <ul class="navbar-links" id="nav-links">
+        <li><a href="/pedidos/dia/" th:href="@{/pedidos/dia/{f}(f=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')})}">Pedidos</a></li>
+        <li><a href="/menu/semana">Menú</a></li>
+        <li><a href="/cobros">Caja</a></li>
+        <li><a href="/clientes">Clientes</a></li>
+        <li><a href="/platos">Platos</a></li>
+        <li><a href="/semanas">Semanas</a></li>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-secondary btn-sm">Cerrar sesión</button>
+        </form>
+    </ul>
+    <button class="navbar-menu" onclick="toggleNav()">&#9776;</button>
+</nav>
+<script th:fragment="navscript">
+    function toggleNav() {
+        document.getElementById('nav-links').classList.toggle('open');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Menú de hoy — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Menú de hoy</h1>
+        <p th:text="'Configurá los platos disponibles para hoy'"></p>
+    </div>
+
+    <div class="alert alert-warning" th:if="${semanaActual == null}">
+        No hay semana activa. Primero cargá la semana en <a href="/semanas">Semanas</a>.
+    </div>
+
+    <div th:if="${semanaActual != null}">
+
+        <div class="alert alert-warning" th:if="${menuHoy == null}">
+            Todavía no creaste el menú de hoy.
+            <form th:action="@{/menu/crear}" method="post" style="display:inline;">
+                <input type="hidden" name="fecha" th:value="${fechaHoy}"/>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-left: 8px;">
+                    Crear menú de hoy
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${menuHoy != null}">
+
+            <div class="card">
+                <div class="card-title">Platos principales</div>
+                <div class="platos-grid">
+                    <span th:each="plato : ${menuHoy.platos}"
+                          th:if="${plato.tipo.name() == 'PRINCIPAL'}"
+                          class="plato-item badge-principal">
+                        <span th:text="${plato.nombre}"></span>
+                        <form th:action="@{/menu/quitar-plato}" method="post" style="display:inline;">
+                            <input type="hidden" name="menuDiaId" th:value="${menuHoy.id}"/>
+                            <input type="hidden" name="platoId" th:value="${plato.id}"/>
+                            <input type="hidden" name="fecha" th:value="${menuHoy.fecha}"/>
+                            <button type="submit" class="btn-icon">×</button>
+                        </form>
+                    </span>
+                </div>
+                <form th:action="@{/menu/agregar-plato}" method="post"
+                      style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+                    <input type="hidden" name="menuDiaId" th:value="${menuHoy.id}"/>
+                    <input type="hidden" name="fecha" th:value="${menuHoy.fecha}"/>
+                    <select name="platoId" class="form-control" style="max-width: 260px;">
+                        <option th:each="p : ${principalesDisponibles}"
+                                th:value="${p.id}"
+                                th:text="${p.nombre}">
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Agregar principal</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Guarniciones</div>
+                <div class="platos-grid">
+                    <span th:each="plato : ${menuHoy.platos}"
+                          th:if="${plato.tipo.name() == 'GUARNICION'}"
+                          class="plato-item badge-guarnicion">
+                        <span th:text="${plato.nombre}"></span>
+                        <form th:action="@{/menu/quitar-plato}" method="post" style="display:inline;">
+                            <input type="hidden" name="menuDiaId" th:value="${menuHoy.id}"/>
+                            <input type="hidden" name="platoId" th:value="${plato.id}"/>
+                            <input type="hidden" name="fecha" th:value="${menuHoy.fecha}"/>
+                            <button type="submit" class="btn-icon">×</button>
+                        </form>
+                    </span>
+                </div>
+                <form th:action="@{/menu/agregar-plato}" method="post"
+                      style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+                    <input type="hidden" name="menuDiaId" th:value="${menuHoy.id}"/>
+                    <input type="hidden" name="fecha" th:value="${menuHoy.fecha}"/>
+                    <select name="platoId" class="form-control" style="max-width: 260px;">
+                        <option th:each="p : ${guarnicionsDisponibles}"
+                                th:value="${p.id}"
+                                th:text="${p.nombre}">
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Agregar guarnición</button>
+                </form>
+            </div>
+
+            <a th:href="@{/pedidos/dia/{fecha}(fecha=${menuHoy.fecha})}"
+               class="btn btn-primary">
+                Ver pedidos de hoy →
+            </a>
+
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

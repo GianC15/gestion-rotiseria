@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Platos — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Platos</h1>
+        <p>Catálogo de platos principales y guarniciones</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Agregar plato</div>
+        <form th:action="@{/platos/guardar}" th:object="${platoNuevo}" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre del plato</label>
+                    <input class="form-control" type="text" th:field="*{nombre}"
+                           placeholder="Ej: Milanesa napolitana" required/>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select class="form-control" th:field="*{tipo}">
+                        <option value="PRINCIPAL">Principal</option>
+                        <option value="GUARNICION">Guarnición</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar plato</button>
+        </form>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="plato : ${platos}">
+                <td th:text="${plato.nombre}" style="font-weight: 500;"></td>
+                <td>
+                        <span th:text="${plato.tipo}"
+                              th:classappend="${plato.tipo == T(com.lodemonica.lodemonica.model.Plato.TipoPlato).PRINCIPAL} ? 'badge-principal' : 'badge-guarnicion'"
+                              class="badge">
+                        </span>
+                </td>
+                <td>
+                    <a th:href="@{/platos/eliminar/{id}(id=${plato.id})}"
+                       class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

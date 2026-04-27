@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Error — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+    <div style="text-align: center; padding: 60px 20px;">
+
+        <div style="font-size: 72px; font-weight: 700; color: var(--primary); line-height: 1;">
+            <span th:text="${status}">Error</span>
+        </div>
+
+        <h1 style="font-size: 22px; font-weight: 600; margin: 16px 0 8px;">
+            Algo salió mal
+        </h1>
+
+        <p style="color: var(--text-muted); font-size: 15px; max-width: 400px; margin: 0 auto 32px;">
+            <span th:text="${error}"></span>
+        </p>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="/" class="btn btn-primary">Volver al inicio</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">Volver atrás</a>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

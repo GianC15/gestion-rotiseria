@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Clientes — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Clientes</h1>
+        <p>Administrá tu lista de clientes activos</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Agregar cliente</div>
+        <form th:action="@{/clientes/guardar}" th:object="${clienteNuevo}" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre completo</label>
+                    <input class="form-control" type="text" th:field="*{nombre}"
+                           placeholder="Ej: María López" required/>
+                    <span th:if="${#fields.hasErrors('nombre')}"
+                          th:errors="*{nombre}"
+                          style="color: var(--danger); font-size: 13px; margin-top: 4px;">
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono (opcional)</label>
+                    <input class="form-control" type="text" th:field="*{telefono}" placeholder="Ej: 11 2345-6789"/>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar cliente</button>
+        </form>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th class="col-telefono">Teléfono</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cliente : ${clientes}">
+                <td>
+                    <a th:href="@{/clientes/{id}(id=${cliente.id})}"
+                       th:text="${cliente.nombre}"
+                       style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                    </a>
+                </td>
+                <td class="col-telefono"
+                    th:text="${cliente.telefono ?: '—'}"
+                    style="color: var(--text-muted);">
+                </td>
+                <td class="acciones-td">
+                    <a th:href="@{/pedidos/semana/{id}(id=${cliente.id})}"
+                       class="btn btn-primary btn-sm">Pedidos semana</a>
+                    <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
+                       class="btn btn-secondary btn-sm">Editar</a>
+                    <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}"
+                       class="btn btn-danger btn-sm">Dar de baja</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

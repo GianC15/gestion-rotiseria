@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pedidos semanales — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+    <style>
+        .dia-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .dia-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid var(--border);
+        }
+        .dia-nombre { font-weight: 600; font-size: 15px; text-transform: capitalize; }
+        .dia-body { padding: 16px 20px; }
+        .pedido-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+        .pedido-item-info { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .cantidad { font-weight: 700; color: var(--primary); font-size: 13px; }
+        .btn-eliminar {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--danger);
+            font-size: 18px;
+            padding: 0 4px;
+        }
+        .agregar-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 60px auto;
+            gap: 8px;
+            margin-top: 12px;
+            align-items: flex-end;
+        }
+        .sin-menu {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-style: italic;
+        }
+        @media (max-width: 640px) {
+            .agregar-form { grid-template-columns: 1fr 1fr; }
+            .agregar-form button { grid-column: 1 / -1; }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1 th:text="'Pedidos de ' + ${cliente.nombre}"></h1>
+        <p th:if="${semana != null}"
+           th:text="'Semana del ' + ${semana.fechaInicio} + ' al ' + ${semana.fechaFin}">
+        </p>
+    </div>
+
+    <div class="alert alert-warning" th:if="${semanaActual == null}">
+        No hay semana activa. Cargá la semana en <a href="/semanas">Semanas</a>.
+    </div>
+
+    <div th:if="${semanaActual != null}">
+        <div th:each="entry : ${menuPorDia}">
+            <div class="dia-card">
+
+                <div class="dia-header">
+                    <span class="dia-nombre" th:text="${nombresDias[entry.key]}"></span>
+                    <span class="badge badge-activa" th:if="${entry.value != null}">
+                        Menú disponible
+                    </span>
+                </div>
+
+                <div class="dia-body">
+
+                    <!-- Sin menú cargado para ese día -->
+                    <div th:if="${entry.value == null}">
+                        <span class="sin-menu">
+                            Sin menú cargado para este día.
+                            <a th:href="@{/menu/semana}">Cargá el menú primero.</a>
+                        </span>
+                    </div>
+
+                    <!-- Con menú -->
+                    <div th:if="${entry.value != null}">
+
+                        <!-- Pedidos existentes del cliente para ese día -->
+                        <div th:each="pedido : ${pedidosPorDia[entry.key]}"
+                             th:if="${pedido.cliente.id == cliente.id}">
+                            <div th:each="item : ${pedido.items}" class="pedido-item-row">
+                                <div class="pedido-item-info">
+                                    <span class="cantidad" th:text="${item.cantidad} + 'x'"></span>
+                                    <span th:text="${item.platoPrincipal?.nombre}"
+                                          class="badge badge-principal"></span>
+                                    <span th:if="${item.guarnicion != null}"
+                                          th:text="'+ ' + ${item.guarnicion.nombre}"
+                                          class="badge badge-guarnicion"></span>
+                                </div>
+                                <form th:action="@{/pedidos/quitar-item/{pedidoId}/{itemId}(pedidoId=${pedido.id},itemId=${item.id})}"
+                                      method="get" style="display:inline;">
+                                    <button type="submit" class="btn-eliminar">&#x2715;</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Formulario para agregar pedido en ese día -->
+                        <form th:action="@{/pedidos/guardar}" method="post">
+                            <input type="hidden" name="clienteId" th:value="${cliente.id}"/>
+                            <input type="hidden" name="menuDiaId" th:value="${entry.value.id}"/>
+                            <input type="hidden" name="fecha" th:value="${entry.key}"/>
+                            <input type="hidden" name="origen" value="semana"/>
+                            <div class="agregar-form">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Principal</label>
+                                    <select name="platoPrincipalId" class="form-control" required>
+                                        <option th:each="p : ${entry.value.platos}"
+                                                th:if="${p.tipo.name() == 'PRINCIPAL'}"
+                                                th:value="${p.id}"
+                                                th:text="${p.nombre}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Guarnición</label>
+                                    <select name="guarnicionId" class="form-control">
+                                        <option value="">Sin guarnición</option>
+                                        <option th:each="g : ${entry.value.platos}"
+                                                th:if="${g.tipo.name() == 'GUARNICION'}"
+                                                th:value="${g.id}"
+                                                th:text="${g.nombre}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Cant.</label>
+                                    <input type="number" name="cantidad" class="form-control"
+                                           value="1" min="1" max="10"/>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 8px;">
+        <a href="/clientes" class="btn btn-secondary">← Volver a clientes</a>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Semanas — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Semanas</h1>
+        <p>Gestioná las semanas de trabajo y el precio de la vianda</p>
+    </div>
+
+    <div class="alert alert-warning" th:if="${semanaActual == null}">
+        No hay semana activa para hoy. Cargá la semana actual para poder operar.
+    </div>
+
+    <div class="alert alert-success" th:if="${semanaActual != null}">
+        Semana activa del
+        <strong th:text="${semanaActual.fechaInicio}"></strong> al
+        <strong th:text="${semanaActual.fechaFin}"></strong>
+        — precio vianda:
+        <strong th:text="'$' + ${semanaActual.precioVianda}"></strong>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Nueva semana</div>
+        <form th:action="@{/semanas/guardar}" th:object="${semaNueva}" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha inicio</label>
+                    <input class="form-control" type="date" th:field="*{fechaInicio}" required/>
+                </div>
+                <div class="form-group">
+                    <label>Fecha fin</label>
+                    <input class="form-control" type="date" th:field="*{fechaFin}" required/>
+                </div>
+                <div class="form-group">
+                    <label>Precio por vianda</label>
+                    <input class="form-control" type="number" th:field="*{precioVianda}"
+                           step="0.01" min="0" placeholder="Ej: 1500" required/>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Crear semana</button>
+        </form>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Desde</th>
+                <th>Hasta</th>
+                <th>Precio vianda</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="semana : ${semanas}">
+                <td th:text="${semana.fechaInicio}"></td>
+                <td th:text="${semana.fechaFin}"></td>
+                <td th:text="'$' + ${semana.precioVianda}"></td>
+                <td>
+                        <span class="badge badge-activa"
+                              th:if="${semanaActual != null && semanaActual.id == semana.id}">
+                            Activa
+                        </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

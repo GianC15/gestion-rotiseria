@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Caja semanal — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+    <style>
+        .monto-debe { color: var(--danger); font-weight: 600; }
+        .monto-ok { color: var(--success); font-weight: 600; }
+        .form-pago { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        @media (max-width: 640px) {
+            .col-hide { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Caja semanal</h1>
+        <p th:if="${semana != null}"
+           th:text="'Semana del ' + ${semana.fechaInicio} + ' al ' + ${semana.fechaFin} + ' — $' + ${semana.precioVianda} + ' por vianda'">
+        </p>
+    </div>
+
+    <div class="alert alert-warning" th:if="${semanaActual == null}">
+        No hay semana activa. Cargá la semana en <a href="/semanas">Semanas</a>.
+    </div>
+
+    <div th:if="${semanaActual != null}">
+
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+            <a href="/cobros/deudores" class="btn btn-secondary">Ver deudores</a>
+        </div>
+
+        <div class="table-wrapper" style="margin-bottom: 24px;">
+            <table>
+                <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th class="col-hide">Total</th>
+                    <th class="col-hide">Pagado</th>
+                    <th>Saldo</th>
+                    <th class="col-hide">Modalidad</th>
+                    <th>Registrar pago</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cobro : ${cobros}">
+                    <td style="font-weight: 500;" th:text="${cobro.cliente.nombre}"></td>
+                    <td class="col-hide" th:text="'$' + ${cobro.montoTotal}"></td>
+                    <td class="col-hide" th:text="'$' + ${cobro.montoPagado}"></td>
+                    <td>
+                            <span th:text="'$' + ${cobro.montoTotal - cobro.montoPagado}"
+                                  th:classappend="${cobro.montoTotal > cobro.montoPagado} ? 'monto-debe' : 'monto-ok'">
+                            </span>
+                    </td>
+                    <td class="col-hide">
+                            <span th:text="${cobro.modalidad}"
+                                  th:classappend="${cobro.modalidad == T(com.lodemonica.lodemonica.model.Cobro.Modalidad).DIA} ? 'badge-dia' : (${cobro.modalidad == T(com.lodemonica.lodemonica.model.Cobro.Modalidad).SEMANA} ? 'badge-semana' : 'badge-fiado')"
+                                  class="badge">
+                            </span>
+                    </td>
+                    <td>
+                        <form th:action="@{/cobros/pago/{id}(id=${cobro.id})}"
+                              method="post" class="form-pago">
+                            <input type="number" name="monto" class="form-control"
+                                   step="0.01" min="0" placeholder="$ monto"
+                                   style="width: 110px;" required/>
+                            <button type="submit" class="btn btn-success btn-sm">Registrar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0;">
+                <div class="stat-card ok">
+                    <div class="stat-label">Total cobrado esta semana</div>
+                    <div class="stat-value" th:text="'$' + ${totalCobrado}"></div>
+                </div>
+                <div class="stat-card" th:classappend="${totalAdeudado > 0} ? 'warn' : 'ok'">
+                    <div class="stat-label">Total adeudado</div>
+                    <div class="stat-value" th:text="'$' + ${totalAdeudado}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Agregar cliente a la semana</div>
+            <form th:action="@{/cobros/registrar}" method="post">
+                <input type="hidden" name="semanaId" th:value="${semana.id}"/>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cliente</label>
+                        <select name="clienteId" class="form-control" required>
+                            <option value="">Seleccioná un cliente</option>
+                            <option th:each="c : ${clientes}"
+                                    th:value="${c.id}"
+                                    th:text="${c.nombre}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Modalidad de pago</label>
+                        <select name="modalidad" class="form-control">
+                            <option value="DIA">Paga por día</option>
+                            <option value="SEMANA">Paga al cierre</option>
+                            <option value="FIADO">Fiado</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

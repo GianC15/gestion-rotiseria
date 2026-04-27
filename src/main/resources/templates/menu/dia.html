@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Menú del día — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Menú del día</h1>
+        <p th:text="${fecha}"></p>
+    </div>
+
+    <div class="alert alert-warning" th:if="${menuDia == null}">
+        No hay menú cargado para este día.
+        <form th:action="@{/menu/crear}" method="post" style="display:inline;">
+            <input type="hidden" name="fecha" th:value="${fecha}"/>
+            <button type="submit" class="btn btn-primary btn-sm" style="margin-left: 8px;">
+                Crear menú
+            </button>
+        </form>
+    </div>
+
+    <div th:if="${menuDia != null}">
+        <div class="card">
+            <div class="card-title">Principales</div>
+            <div class="platos-grid">
+                <span th:each="plato : ${menuDia.platos}"
+                      th:if="${plato.tipo.name() == 'PRINCIPAL'}"
+                      th:text="${plato.nombre}"
+                      class="plato-item badge-principal">
+                </span>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Guarniciones</div>
+            <div class="platos-grid">
+                <span th:each="plato : ${menuDia.platos}"
+                      th:if="${plato.tipo.name() == 'GUARNICION'}"
+                      th:text="${plato.nombre}"
+                      class="plato-item badge-guarnicion">
+                </span>
+            </div>
+        </div>
+        <a th:href="@{/pedidos/dia/{fecha}(fecha=${menuDia.fecha})}"
+           class="btn btn-primary">
+            Ver pedidos de este día →
+        </a>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

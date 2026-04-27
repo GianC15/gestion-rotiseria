@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Buen día</h1>
+        <p th:text="'Hoy es ' + ${fechaHoy}"></p>
+    </div>
+
+    <div class="alert alert-warning" th:if="${semanaActual == null}">
+        No hay semana activa. <a href="/semanas">Cargá la semana actual</a> para poder operar.
+    </div>
+    <div class="alert alert-warning" th:if="${semanaActual != null && menuHoy == null}">
+        No hay menú cargado para hoy. <a href="/menu">Creá el menú de hoy</a>.
+    </div>
+
+    <div class="stats-grid">
+        <div th:classappend="${semanaActual != null} ? 'ok' : 'warn'" class="stat-card">
+            <div class="stat-label">Semana</div>
+            <div class="stat-value" th:text="${semanaActual != null} ? 'Activa' : 'Sin cargar'"></div>
+            <div class="stat-sub" th:if="${semanaActual != null}"
+                 th:text="${semanaActual.fechaInicio} + ' — ' + ${semanaActual.fechaFin}"></div>
+        </div>
+        <div th:classappend="${menuHoy != null} ? 'ok' : 'warn'" class="stat-card">
+            <div class="stat-label">Menú de hoy</div>
+            <div class="stat-value" th:text="${menuHoy != null} ? 'Cargado' : 'Sin cargar'"></div>
+            <div class="stat-sub" th:if="${menuHoy != null}"
+                 th:text="${#lists.size(menuHoy.platos)} + ' platos disponibles'"></div>
+        </div>
+        <div class="stat-card info">
+            <div class="stat-label">Clientes activos</div>
+            <div class="stat-value" th:text="${totalClientes}"></div>
+            <div class="stat-sub">en el sistema</div>
+        </div>
+    </div>
+
+    <div class="modules-grid">
+        <a th:href="@{/pedidos/dia/{f}(f=${fechaHoy})}" class="module-card">
+            <div class="module-icon">📋</div>
+            <h2>Pedidos de hoy</h2>
+            <p>Registrá los pedidos y mirá el resumen de producción.</p>
+        </a>
+        <a href="/menu/semana" class="module-card">
+            <div class="module-icon">🍽</div>
+            <h2>Menú del día</h2>
+            <p>Armá el menú con los platos disponibles.</p>
+        </a>
+        <a href="/cobros" class="module-card">
+            <div class="module-icon">💰</div>
+            <h2>Caja semanal</h2>
+            <p>Registrá pagos y mirá deudores.</p>
+        </a>
+        <a href="/clientes" class="module-card">
+            <div class="module-icon">👥</div>
+            <h2>Clientes</h2>
+            <p>Administrá tu lista de clientes activos.</p>
+        </a>
+        <a href="/platos" class="module-card">
+            <div class="module-icon">🥗</div>
+            <h2>Platos</h2>
+            <p>Gestioná el catálogo de platos y guarniciones.</p>
+        </a>
+        <a href="/semanas" class="module-card">
+            <div class="module-icon">📅</div>
+            <h2>Semanas</h2>
+            <p>Cargá semanas y configurá el precio de la vianda.</p>
+        </a>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>
