@@ -13,6 +13,6 @@ public interface CobroService {
     Cobro guardar(Cobro cobro);
     Cobro registrarPago(Integer cobroId, BigDecimal monto);
     List<Cobro> obtenerDeudores();
-
     Cobro recalcularTotal(Integer cobroId);
+    List<Cobro> obtenerTodosPorCliente(Integer clienteId);
 }

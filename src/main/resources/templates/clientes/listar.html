@@ -63,6 +63,8 @@
                 <td class="acciones-td">
                     <a th:href="@{/pedidos/semana/{id}(id=${cliente.id})}"
                        class="btn btn-primary btn-sm">Pedidos semana</a>
+                    <a th:href="@{/cobros/cliente/{id}(id=${cliente.id})}"
+                       class="btn btn-secondary btn-sm">Cuenta corriente</a>
                     <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
                        class="btn btn-secondary btn-sm">Editar</a>
                     <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}"

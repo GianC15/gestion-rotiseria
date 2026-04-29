@@ -13,4 +13,5 @@ public interface CobroRepository extends JpaRepository<Cobro, Integer> {
 
     List<Cobro> findBySemana(Semana semana);
     Optional<Cobro> findByClienteAndSemana(Cliente cliente, Semana semana);
+    List<Cobro> findByCliente(Cliente cliente);
 }

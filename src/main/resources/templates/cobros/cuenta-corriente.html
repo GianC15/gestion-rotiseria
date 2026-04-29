@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cuenta corriente — Lo De Monica</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}"/>
+    <style>
+        .monto-debe { color: var(--danger); font-weight: 600; }
+        .monto-ok { color: var(--success); font-weight: 600; }
+        .form-pago { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        @media (max-width: 640px) { .col-hide { display: none; } }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1 th:text="'Cuenta corriente — ' + ${cliente.nombre}"></h1>
+        <p>Historial completo de cobros</p>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card ok">
+            <div class="stat-label">Total pagado</div>
+            <div class="stat-value" th:text="'$' + ${totalPagado}"></div>
+        </div>
+        <div class="stat-card" th:classappend="${totalDeuda > 0} ? 'warn' : 'ok'">
+            <div class="stat-label">Total adeudado</div>
+            <div class="stat-value" th:text="'$' + ${totalDeuda}"></div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Semana</th>
+                <th class="col-hide">Total</th>
+                <th class="col-hide">Pagado</th>
+                <th>Saldo</th>
+                <th class="col-hide">Modalidad</th>
+                <th>Registrar pago</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cobro : ${cobros}">
+                <td>
+                    <span th:text="${cobro.semana.fechaInicio} + ' — ' + ${cobro.semana.fechaFin}"></span>
+                </td>
+                <td class="col-hide" th:text="'$' + ${cobro.montoTotal}"></td>
+                <td class="col-hide" th:text="'$' + ${cobro.montoPagado}"></td>
+                <td>
+                        <span th:text="'$' + ${cobro.saldo}"
+                              th:classappend="${cobro.saldo > 0} ? 'monto-debe' : 'monto-ok'">
+                        </span>
+                </td>
+                <td class="col-hide">
+                        <span th:text="${cobro.modalidad}"
+                              th:classappend="${cobro.modalidad == T(com.lodemonica.lodemonica.model.Cobro.Modalidad).DIA} ? 'badge-dia' : (${cobro.modalidad == T(com.lodemonica.lodemonica.model.Cobro.Modalidad).SEMANA} ? 'badge-semana' : 'badge-fiado')"
+                              class="badge">
+                        </span>
+                </td>
+                <td>
+                    <div th:if="${cobro.saldo > 0}">
+                        <form th:action="@{/cobros/pago/{id}(id=${cobro.id})}"
+                              method="post" class="form-pago">
+                            <input type="number" name="monto" class="form-control"
+                                   step="0.01" min="0"
+                                   th:placeholder="'$ monto'"
+                                   th:max="${cobro.saldo}"
+                                   style="width: 110px;" required/>
+                            <button type="submit" class="btn btn-success btn-sm">Registrar</button>
+                        </form>
+                    </div>
+                    <span th:if="${cobro.saldo <= 0}" class="badge badge-activa">Pagado</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="/clientes" class="btn btn-secondary">← Volver a clientes</a>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/nav :: navscript}"></div>
+</body>
+</html>

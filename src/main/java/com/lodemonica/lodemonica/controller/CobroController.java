@@ -99,4 +99,25 @@ public class CobroController {
         model.addAttribute("totalDeuda", totalDeuda);
         return "cobros/deudores";
     }
+
+    @GetMapping("/cliente/{clienteId}")
+    public String cuentaCorriente(@PathVariable Integer clienteId, Model model) {
+        Cliente cliente = clienteService.obtenerPorId(clienteId);
+        List<Cobro> cobros = cobroService.obtenerTodosPorCliente(clienteId);
+
+        BigDecimal totalDeuda = cobros.stream()
+                .map(c -> c.getMontoTotal().subtract(c.getMontoPagado()))
+                .filter(s -> s.compareTo(BigDecimal.ZERO) > 0)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalPagado = cobros.stream()
+                .map(Cobro::getMontoPagado)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("cliente", mapper.toDTO(cliente));
+        model.addAttribute("cobros", mapper.toCobroDTOList(cobros));
+        model.addAttribute("totalDeuda", totalDeuda);
+        model.addAttribute("totalPagado", totalPagado);
+        return "cobros/cuenta-corriente";
+    }
 }

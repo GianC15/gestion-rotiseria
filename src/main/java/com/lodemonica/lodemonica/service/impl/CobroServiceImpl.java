@@ -24,8 +24,8 @@ public class CobroServiceImpl implements CobroService {
     private final CobroRepository cobroRepository;
     private final ClienteRepository clienteRepository;
     private final SemanaRepository semanaRepository;
-
     private final PedidoRepository pedidoRepository;
+
 
     @Override
     public List<Cobro> obtenerPorSemana(Semana semana) {
@@ -92,5 +92,12 @@ public class CobroServiceImpl implements CobroService {
 
         cobro.setMontoTotal(precioVianda.multiply(BigDecimal.valueOf(totalViandas)));
         return cobroRepository.save(cobro);
+    }
+
+    @Override
+    public List<Cobro> obtenerTodosPorCliente(Integer clienteId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado: " + clienteId));
+        return cobroRepository.findByCliente(cliente);
     }
 }
